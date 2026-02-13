@@ -3,6 +3,7 @@ import time
 import random
 
 
+# Security Fixes Applied: Parameterized Queries and Context Managers
 def insertUser(username, password, DoB):
     con = sql.connect("database_files/database.db")
     cur = con.cursor()
@@ -18,14 +19,17 @@ def retrieveUsers(username, password):
     con = sql.connect("database_files/database.db")
     cur = con.cursor()
 
+    # FIX: Use '?' placeholder to prevent SQL Injection
     cur.execute("SELECT * FROM users WHERE username = ?", (username,))
 
     if cur.fetchone() is None:
         con.close()
         return False
     else:
+        # FIX: Use '?' placeholder to prevent SQL Injection
         cur.execute("SELECT * FROM users WHERE password = ?", (password,))
 
+        # FIX: Use 'with' to ensure files are closed even if code crashes
         with open("visitor_log.txt", "r") as file:
             number = int(file.read().strip())
             number += 1
@@ -45,6 +49,7 @@ def retrieveUsers(username, password):
 def insertFeedback(feedback):
     con = sql.connect("database_files/database.db")
     cur = con.cursor()
+    # FIX: Use '?' placeholder to prevent SQL Injection
     cur.execute("INSERT INTO feedback (feedback) VALUES (?)", (feedback,))
     con.commit()
     con.close()
@@ -56,6 +61,7 @@ def listFeedback():
     data = cur.execute("SELECT * FROM feedback").fetchall()
     con.close()
 
+    # FIX: Use 'with' to ensure the file is closed properly
     with open("templates/partials/success_feedback.html", "w") as f:
         for row in data:
             f.write("<p>\n")
